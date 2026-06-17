@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { Pool } from 'pg';
+import { Pool, type QueryResultRow } from 'pg';
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -21,7 +21,7 @@ if (process.env.NODE_ENV !== 'production') {
   globalForPg.pgPool = db;
 }
 
-export async function query<T>(text: string, params: unknown[] = []) {
+export async function query<T extends QueryResultRow>(text: string, params: unknown[] = []) {
   const result = await db.query<T>(text, params);
   return result.rows;
 }
