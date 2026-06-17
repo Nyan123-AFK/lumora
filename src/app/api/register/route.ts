@@ -3,7 +3,7 @@ import { query } from '@/db/postgres';
 import { classOptions } from '@/modules/registration/types';
 import { findUniversityById } from '@/modules/universities/data';
 
-const allowedClasses = new Set(classOptions.map((option) => option.value));
+const allowedClasses = new Set<string>(classOptions.map((option) => option.value));
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     universityId?: string;
   };
 
-  if (!body.classGroup || !allowedClasses.has(body.classGroup as never)) {
+  if (!body.classGroup || !allowedClasses.has(body.classGroup)) {
     return NextResponse.json({ error: 'Недопустимый класс.' }, { status: 400 });
   }
 
