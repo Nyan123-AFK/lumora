@@ -30,6 +30,15 @@ CREATE TABLE IF NOT EXISTS exam_tasks (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS user_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  class_group TEXT NOT NULL CHECK (class_group IN ('9', '10', '11', 'other', 'self')),
+  university_id TEXT NOT NULL,
+  university_name TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE INDEX IF NOT EXISTS idx_exam_subjects_type ON exam_subjects(exam_type);
 CREATE INDEX IF NOT EXISTS idx_exam_topics_subject ON exam_topics(subject_id);
 CREATE INDEX IF NOT EXISTS idx_exam_tasks_topic ON exam_tasks(topic_id);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_university ON user_profiles(university_id);
