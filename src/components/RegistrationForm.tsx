@@ -14,6 +14,7 @@ export function RegistrationForm() {
   const [selectedUniversity, setSelectedUniversity] = useState<University | null>(null);
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const universities = useMemo(() => {
     const query = normalize(universityQuery);
@@ -36,7 +37,7 @@ export function RegistrationForm() {
     setError('');
   }
 
-  function submit() {
+  async function submit() {
     const exactSelected = selectedUniversity && universityQuery === `${selectedUniversity.name}, ${selectedUniversity.city}`;
 
     if (!exactSelected) {
@@ -45,8 +46,28 @@ export function RegistrationForm() {
       return;
     }
 
-    setSaved(true);
+    setPending(true);
+    setSaved(false);
     setError('');
+
+    const response = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        classGroup,
+        universityId: selectedUniversity.id,
+      }),
+    });
+
+    const payload = (await response.json()) as { error?: string };
+    setPending(false);
+
+    if (!response.ok) {
+      setError(payload.error ?? 'Не удалось сохранить профиль.');
+      return;
+    }
+
+    setSaved(true);
   }
 
   return (
@@ -94,10 +115,10 @@ export function RegistrationForm() {
       </div>
 
       {error ? <p className="error">{error}</p> : null}
-      {saved ? <p className="success">Профиль принят. Класс: {classOptions.find((option) => option.value === classGroup)?.label}.</p> : null}
+      {saved ? <p className="success">Профиль сохранён. Карточки ниже доступны.</p> : null}
 
-      <button className="primary-button" type="button" onClick={submit}>
-        Сохранить профиль
+      <button className="primary-button" type="button" onClick={submit} disabled={pending}>
+        {pending ? 'Сохраняем...' : 'Сохранить профиль'}
       </button>
     </section>
   );
